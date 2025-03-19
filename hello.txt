@@ -1,0 +1,2 @@
+package 
+fmt.Println("Smth interesting") package if smth_1 > smth_2 package trulala
