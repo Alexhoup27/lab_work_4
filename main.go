@@ -9,32 +9,33 @@ import (
 
 var file_path string
 
-//	func split_if(data string) []string {
-//		count := strings.Count(data, " if ") + strings.Count(data, " if(")
-//		result := make([]string, count+1)
-//		for i := 0; i < count; i++ {
-//			now_ind := min(strings.Index(data, " if "),
-//				strings.Index(data, " if("))
-//			result[i] = data[:now_ind]
-//			data = data[now_ind+4:]
-//		}
-//		result[count] = data
-//		return result
-//	}
-func double_split(data, first_delim, second_delim string) []string {
-	count := strings.Count(data, first_delim) + strings.Count(data, second_delim)
-	result := make([]string, count+1)
-	now_len := 0
-	for i := 0; i < count; i++ {
-		now_ind := min(strings.Index(data, first_delim),
-			strings.Index(data, second_delim))
-		if strings.Index(data, first_delim) < strings.Index(data, second_delim) {
-			now_len = len(first_delim)
-		} else {
-			now_len = len(second_delim)
+func n_count(data string, delims []string) int {
+	to_return := 0
+	for i := 0; i < len(delims); i++ {
+		to_return += strings.Count(data, delims[i])
+	}
+	return to_return
+}
+
+func ind_qualifier(data string, delims []string) [2]int {
+	var to_return [2]int
+	to_return[0] = 1e+9
+	for i := 0; i < len(delims); i++ {
+		if to_return[0] > index_preprocessor(strings.Index(data, delims[i])) {
+			to_return[0] = index_preprocessor(strings.Index(data, delims[i]))
+			to_return[1] = len(delims[i])
 		}
-		result[i] = data[:now_ind]
-		data = data[now_ind+now_len:]
+	}
+	return to_return
+}
+
+func n_split(data string, delims []string) []string {
+	count := n_count(data, delims)
+	result := make([]string, count+1)
+	for i := 0; i < count; i++ {
+		now_data := ind_qualifier(data, delims)
+		result[i] = data[:now_data[0]]
+		data = data[now_data[0]+now_data[1]+1:]
 	}
 	result[count] = data
 	return result
@@ -47,35 +48,6 @@ func index_preprocessor(ind int) int {
 		return ind
 	}
 }
-
-func forth_split(data, first_delim, second_delim, third_delim, forth_delim string) []string {
-	count := strings.Count(data, first_delim) + strings.Count(data, second_delim) +
-		strings.Count(data, third_delim) + strings.Count(data, forth_delim)
-	result := make([]string, count+1)
-	now_len := 0
-	for i := 0; i < count; i++ {
-		now_ind := min(index_preprocessor(strings.Index(data, first_delim)),
-			index_preprocessor(strings.Index(data, second_delim)),
-			index_preprocessor(strings.Index(data, third_delim)),
-			index_preprocessor(strings.Index(data, forth_delim)))
-		if now_ind == strings.Index(data, first_delim) {
-			now_len = len(first_delim)
-		} else if now_ind == strings.Index(data, second_delim) {
-			now_len = len(second_delim)
-		} else if now_ind == strings.Index(data, third_delim) {
-			now_len = len(third_delim)
-		} else {
-			now_len = len(forth_delim)
-		}
-		// fmt.Println(data, strings.Contains(data, first_delim), strings.Contains(data, second_delim),
-		// strings.Contains(data, third_delim), strings.Contains(data, forth_delim))
-		result[i] = data[:now_ind]
-		data = data[now_ind+now_len:]
-	}
-	result[count] = data
-	return result
-}
-
 func split(data, delimeter string) []string {
 	result := make([]string, strings.Count(data, delimeter)+1)
 	count := strings.Count(data, delimeter)
@@ -105,7 +77,7 @@ func main() {
 	// fmt.Println(strings.Count(text, "package") + 1)
 	for i := 0; i < len(to_analyze); i++ {
 		// new_data := double_split(to_analyze[i], " if ", " if(")
-		new_data := forth_split(to_analyze[i], " if ", " if(", "\tif ", "\tif(")
+		new_data := n_split(to_analyze[i], []string{" if ", " if(", "\tif ", "\tif("})
 		now_deep := 0
 		max_local_deep := 0
 		for g := 0; g < len(new_data); g++ {
