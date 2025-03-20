@@ -58,6 +58,15 @@ func split(data, delimeter string) []string {
 	result[count] = data
 	return result
 }
+
+func find_else(data string) bool {
+	if strings.Contains(data, " else") || strings.Contains(data, ";else") ||
+		strings.Contains(data, "\telse") || strings.Contains(data, "\nelse") {
+		return true
+	}
+	return false
+}
+
 func main() {
 	fmt.Println("Enter file name with data type")
 	fmt.Scan(&file_path)
@@ -77,12 +86,11 @@ func main() {
 	// fmt.Println(strings.Count(text, "package") + 1)
 	for i := 0; i < len(to_analyze); i++ {
 		// new_data := double_split(to_analyze[i], " if ", " if(")
-		new_data := n_split(to_analyze[i], []string{" if ", " if(", "\tif ", "\tif("})
+		new_data := n_split(to_analyze[i], []string{" if", "\tif", ";if", "\nif"})
 		now_deep := 0
 		max_local_deep := 0
 		for g := 0; g < len(new_data); g++ {
-			if strings.Contains(new_data[g], " else ") || strings.Contains(new_data[g], " else(") ||
-				strings.Contains(new_data[g], "\telse(") || strings.Contains(new_data[g], "\telse ") {
+			if find_else(new_data[g]) {
 				now_deep--
 			} else {
 				now_deep++
@@ -100,4 +108,5 @@ func main() {
 		}
 	}
 	fmt.Println(result, max_deep)
+	// file_out, err := os.Create("output.txt")
 }
