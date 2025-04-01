@@ -72,7 +72,7 @@ func main() {
 	fmt.Scan(&file_path)
 	file, err := os.Open(file_path)
 	result := 0
-	max_deep := 0
+	max_deep := -1
 	if err != nil {
 		panic(err)
 	}
@@ -86,12 +86,20 @@ func main() {
 	// fmt.Println(strings.Count(text, "package") + 1)
 	for i := 0; i < len(to_analyze); i++ {
 		// new_data := double_split(to_analyze[i], " if ", " if(")
-		new_data := n_split(to_analyze[i], []string{" if", "\tif", ";if", "\nif"})
+		now_data := strings.ReplaceAll(to_analyze[i], "\nif", "\tif")
+		now_data = strings.ReplaceAll(now_data, "{if", "\tif")
+		new_data := n_split(now_data, []string{" if", "\tif", ";if", "\nif"})
 		now_deep := 0
 		max_local_deep := 0
 		for g := 0; g < len(new_data); g++ {
+			// fmt.Println(new_data[g])
+			// fmt.Println(find_else(new_data[g]))
+
 			if find_else(new_data[g]) {
 				now_deep--
+			} else if strings.Count(new_data[g], "{") >= 1 &&
+				strings.Count(new_data[g], "}") >= 1 {
+				now_deep += 0
 			} else {
 				now_deep++
 			}
