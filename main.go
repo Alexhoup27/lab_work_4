@@ -95,7 +95,8 @@ func main() {
 			// fmt.Println(new_data[g])
 			// fmt.Println(find_else(new_data[g]))
 
-			if find_else(new_data[g]) {
+			if find_else(new_data[g]) && strings.Count(new_data[g], "{") ==
+				strings.Count(new_data[g], "}") {
 				now_deep--
 			} else if strings.Count(new_data[g], "{") >= 1 &&
 				strings.Count(new_data[g], "}") >= 1 {
